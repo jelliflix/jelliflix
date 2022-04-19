@@ -1,0 +1,28 @@
+redis:
+  addr: :6379
+  pass:
+
+services:
+  imdb:
+    user: ur123456789
+    refreshRate: 1
+
+  omdb:
+    token: xxxxxxxx
+
+  torrent:
+    clients:
+      - YTS
+      - TPB
+      - RARBG
+    quality:
+      series: 720p
+      movies: 1080p
+
+  jellyfin:
+    path: "mnt/jelliflix/"
+
+integrations:
+  telegram:
+    user: 111111111
+    token: "1111111111:xxxxxxxxxxx"
