@@ -39,6 +39,7 @@ type (
 	}
 
 	torrent struct {
+		Port    int
 		Clients []string
 		Quality struct {
 			Movies string

@@ -11,6 +11,7 @@ services:
     token: xxxxxxxx
 
   torrent:
+    port: 50007
     clients:
       - YTS
       - TPB
