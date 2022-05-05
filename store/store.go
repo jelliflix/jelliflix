@@ -1,71 +1,100 @@
 package store
 
 import (
-	"context"
-	"fmt"
+	"log"
 
-	"github.com/go-redis/redis/v8"
-	"github.com/jelliflix/jelliflix/infrastructure/datastore"
+	"github.com/dgraph-io/badger/v3"
 )
-
-var (
-	Movies   Kind = "M"
-	Episodes Kind = "EP"
-)
-
-type Kind string
 
 type Store struct {
-	redis *redis.Client
+	db *badger.DB
 }
 
-func NewStore() *Store {
-	r := datastore.NewRedis()
-	return &Store{redis: r}
+func NewStore(path string) *Store {
+	c, err := badger.Open(
+		badger.DefaultOptions(path).WithLoggingLevel(badger.ERROR))
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	return &Store{db: c}
 }
 
-func (s *Store) Set(ctx context.Context, kind Kind, imdbID, filename string) {
-	s.redis.Set(ctx, s.getKey(kind, imdbID), filename, 0)
-}
+func (s *Store) Set(id, state string) (err error) {
+	txn := s.db.NewTransaction(true)
+	defer txn.Discard()
 
-func (s *Store) Get(ctx context.Context, kind Kind) (items map[string]string) {
-	keys := s.redis.Keys(ctx, s.getKey(kind, "*")).Val()
+	err = txn.Set([]byte(id), []byte(state))
+	if err != nil {
+		return
+	}
 
-	for _, key := range keys {
-		filename := s.redis.Get(ctx, key).Val()
-		items[key] = filename
+	if err = txn.Commit(); err != nil {
+		return
 	}
 
 	return
 }
 
-func (s *Store) Purge(ctx context.Context, kind Kind, items []string) {
-	panic("implement me")
+func (s *Store) Get(id string) (state string) {
+	_ = s.db.View(func(txn *badger.Txn) (err error) {
+		item, err := txn.Get([]byte(id))
+		if err != nil {
+			return err
+		}
+
+		_ = item.Value(func(val []byte) (err error) {
+			state = string(val)
+
+			return
+		})
+
+		return
+	})
+
+	return state
 }
 
-func (s *Store) Remove(ctx context.Context, kind Kind, imdbID string) {
-	s.redis.Del(ctx, s.getKey(kind, imdbID))
+func (s *Store) Items() (items map[string]string) {
+	items = make(map[string]string)
+	_ = s.db.View(func(txn *badger.Txn) (err error) {
+		opts := badger.DefaultIteratorOptions
+		opts.PrefetchSize = 10
+		it := txn.NewIterator(opts)
+		defer it.Close()
+		for it.Rewind(); it.Valid(); it.Next() {
+			item := it.Item()
+			k := item.Key()
+			err = item.Value(func(v []byte) (err error) {
+				items[string(k)] = string(v)
+				return
+			})
+			if err != nil {
+				return
+			}
+		}
+		return
+	})
+
+	return
 }
 
-func (s *Store) Exists(ctx context.Context, kind Kind, imdbID string) bool {
-	return s.redis.Get(ctx, s.getKey(kind, imdbID)).Val() != ""
+func (s *Store) Remove(id string) {
+	_ = s.db.Update(func(txn *badger.Txn) error {
+		if err := txn.Delete([]byte(id)); err != nil {
+			return err
+		}
+
+		return txn.Commit()
+	})
 }
 
-func (s *Store) getKey(kind Kind, imdbID string) string {
-	switch kind {
-	case Movies:
-		return s.moviesKey(imdbID)
-	case Episodes:
-		return s.episodesKey(imdbID)
-	}
+func (s *Store) Exists(id string) (exists bool) {
+	_ = s.db.View(func(txn *badger.Txn) error {
+		_, err := txn.Get([]byte(id))
+		exists = err == nil
+		return err
+	})
 
-	return ""
-}
-
-func (s *Store) moviesKey(imdbID string) string {
-	return fmt.Sprintf("m:%s", imdbID)
-}
-
-func (s *Store) episodesKey(imdbID string) string {
-	return fmt.Sprintf("ep:%s", imdbID)
+	return
 }
