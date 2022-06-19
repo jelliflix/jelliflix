@@ -9,3 +9,6 @@
 
 # IntelliJ project files
 .idea/
+
+# Go dist files
+dist/
