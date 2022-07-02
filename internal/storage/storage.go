@@ -1,4 +1,4 @@
-package store
+package storage
 
 import (
 	"log"
@@ -6,21 +6,21 @@ import (
 	"github.com/dgraph-io/badger/v3"
 )
 
-type Store struct {
+type Storage struct {
 	db *badger.DB
 }
 
-func NewStore(path string) *Store {
+func New(path string) *Storage {
 	c, err := badger.Open(
 		badger.DefaultOptions(path).WithLoggingLevel(badger.ERROR))
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	return &Store{db: c}
+	return &Storage{db: c}
 }
 
-func (s *Store) Set(id, state string) (err error) {
+func (s *Storage) Set(id, state string) (err error) {
 	txn := s.db.NewTransaction(true)
 	defer txn.Discard()
 
@@ -36,7 +36,7 @@ func (s *Store) Set(id, state string) (err error) {
 	return
 }
 
-func (s *Store) Get(id string) (state string) {
+func (s *Storage) Get(id string) (state string) {
 	_ = s.db.View(func(txn *badger.Txn) (err error) {
 		item, err := txn.Get([]byte(id))
 		if err != nil {
@@ -55,7 +55,7 @@ func (s *Store) Get(id string) (state string) {
 	return state
 }
 
-func (s *Store) Items() (items map[string]string) {
+func (s *Storage) Items() (items map[string]string) {
 	items = make(map[string]string)
 	_ = s.db.View(func(txn *badger.Txn) (err error) {
 		opts := badger.DefaultIteratorOptions
@@ -79,7 +79,7 @@ func (s *Store) Items() (items map[string]string) {
 	return
 }
 
-func (s *Store) Remove(id string) {
+func (s *Storage) Remove(id string) {
 	_ = s.db.Update(func(txn *badger.Txn) error {
 		if err := txn.Delete([]byte(id)); err != nil {
 			return err
@@ -89,7 +89,7 @@ func (s *Store) Remove(id string) {
 	})
 }
 
-func (s *Store) Exists(id string) (exists bool) {
+func (s *Storage) Exists(id string) (exists bool) {
 	_ = s.db.View(func(txn *badger.Txn) error {
 		_, err := txn.Get([]byte(id))
 		exists = err == nil
