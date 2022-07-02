@@ -18,8 +18,8 @@ jobs:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
-      - name: Build the Docker image
-        run: |
-          docker build . --tag ghcr.io/jelliflix/jelliflix:latest
-          docker run ghcr.io/jelliflix/jelliflix:latest
-          docker push ghcr.io/jelliflix/jelliflix:latest
+      - name: Build and push the Docker image
+        uses: docker/build-push-action@v3
+        with:
+          push: true
+          tags: jelliflix/jelliflix:latest
