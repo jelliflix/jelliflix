@@ -6,6 +6,7 @@ import (
 
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/jelliflix/jelliflix/internal/config"
+	"github.com/jelliflix/jelliflix/internal/exporter"
 	"github.com/jelliflix/jelliflix/internal/ui"
 	"github.com/urfave/cli/v2"
 )
@@ -46,8 +47,12 @@ func main() {
 
 		// Initialize and start app.
 		p := tea.NewProgram(m, opts...)
-		if err := p.Start(); err != nil {
-			log.Fatal("failed to start jelliflix", err)
+		e := exporter.New(cfg, p)
+		if err = e.Start(); err != nil {
+			log.Fatalf("failed to start exporter: %v", err)
+		}
+		if err = p.Start(); err != nil {
+			log.Fatalf("failed to start jelliflix: %v", err)
 		}
 
 		return err
