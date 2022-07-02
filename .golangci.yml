@@ -4,7 +4,6 @@ run:
 linters:
   disable-all: true
   enable:
-    - bodyclose
     - deadcode
     - depguard
     - dogsled
@@ -20,19 +19,13 @@ linters:
     - ineffassign
     - misspell
     - nakedret
-    - noctx
     - nolintlint
-    - rowserrcheck
     - staticcheck
-    - structcheck
     - stylecheck
     - unconvert
-    - unparam
     - unused
     - varcheck
     - whitespace
-    - wastedassign
-    - nilerr
     - godot
     - godox
     - goimports
