@@ -18,7 +18,6 @@ RUN upx --best --lzma /tmp/jelliflix
 
 # Runtime Step
 FROM gcr.io/distroless/static
-LABEL org.opencontainers.image.source="https://github.com/jelliflix/jelliflix"
 COPY --from=builder /tmp/jelliflix /go/bin/jelliflix
 EXPOSE 8080
 
