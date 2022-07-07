@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"log"
 	"os"
 
@@ -48,7 +49,7 @@ func main() {
 		// Initialize and start app.
 		p := tea.NewProgram(m, opts...)
 		e := exporter.New(cfg, p)
-		if err = e.Start(); err != nil {
+		if err = e.Start(context.Background()); err != nil {
 			log.Fatalf("failed to start exporter: %v", err)
 		}
 		if err = p.Start(); err != nil {
