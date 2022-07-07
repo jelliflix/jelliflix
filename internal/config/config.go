@@ -18,20 +18,17 @@ const FileName = "config.yml"
 
 // SettingsConfig struct represents the config for the settings.
 type SettingsConfig struct {
-	RefreshRate    string `yaml:"refresh_rate"`
-	EnableLogging  bool   `yaml:"enable_logging"`
-	StorageDataDir string `yaml:"storage_data_dir"`
+	Timeout         string `yaml:"timeout"`
+	RefreshRate     string `yaml:"refresh_rate"`
+	EnableLogging   bool   `yaml:"enable_logging"`
+	StorageDataDir  string `yaml:"storage_data_dir"`
+	DownloadQuality string `yaml:"download_quality"`
 }
 
 // TorrentConfig represents the config for torrent.
 type TorrentConfig struct {
 	Port      int      `yaml:"port"`
 	Providers []string `yaml:"providers"`
-}
-
-// BrokerConfig represents the config for integrations.
-type BrokerConfig struct {
-	TGid string
 }
 
 // ServiceConfig represents the config for media services.
@@ -51,7 +48,6 @@ type ProviderConfig struct {
 type Config struct {
 	Settings SettingsConfig `yaml:"settings"`
 	Exporter TorrentConfig  `yaml:"exporter"`
-	Broker   BrokerConfig   `yaml:"tracker"`
 	Services struct {
 		Jellyfin ServiceConfig `yaml:"jellyfin"`
 		Plex     ServiceConfig `yaml:"plex"`
@@ -76,9 +72,15 @@ type Parser struct{}
 func (parser Parser) getDefaultConfig() Config {
 	return Config{
 		Settings: SettingsConfig{
-			RefreshRate:    "10s",
-			EnableLogging:  false,
-			StorageDataDir: ".",
+			Timeout:         "10s",
+			RefreshRate:     "10s",
+			EnableLogging:   false,
+			StorageDataDir:  ".",
+			DownloadQuality: "720p",
+		},
+		Exporter: TorrentConfig{
+			Port:      42342,
+			Providers: []string{"RARBG", "YTS", "TPB"},
 		},
 	}
 }
