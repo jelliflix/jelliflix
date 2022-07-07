@@ -7,7 +7,9 @@ require (
 	github.com/charmbracelet/bubbletea v0.20.0
 	github.com/charmbracelet/lipgloss v0.4.0
 	github.com/dgraph-io/badger/v3 v3.2103.2
+	github.com/dustin/go-humanize v1.0.0
 	github.com/jelliflix/imdb v0.0.1
+	github.com/jelliflix/meta v0.0.1
 	github.com/jelliflix/torrent v0.0.2
 	github.com/urfave/cli/v2 v2.5.1
 	gopkg.in/yaml.v3 v3.0.0
@@ -19,7 +21,6 @@ require (
 	github.com/containerd/console v1.0.3 // indirect
 	github.com/cpuguy83/go-md2man/v2 v2.0.1 // indirect
 	github.com/dgraph-io/ristretto v0.1.0 // indirect
-	github.com/dustin/go-humanize v1.0.0 // indirect
 	github.com/gogo/protobuf v1.3.2 // indirect
 	github.com/golang/glog v0.0.0-20160126235308-23def4e6c14b // indirect
 	github.com/golang/groupcache v0.0.0-20200121045136-8c9f03a8e57e // indirect
@@ -27,7 +28,6 @@ require (
 	github.com/golang/snappy v0.0.3 // indirect
 	github.com/google/flatbuffers v1.12.1 // indirect
 	github.com/google/go-cmp v0.5.6 // indirect
-	github.com/jelliflix/meta v0.0.1 // indirect
 	github.com/klauspost/compress v1.12.3 // indirect
 	github.com/kr/pretty v0.3.0 // indirect
 	github.com/lucasb-eyer/go-colorful v1.2.0 // indirect
